@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shell Sort Demonstration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        td, th {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .highlight {
+            background-color: #0f0;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-4">Shell Sort Demonstration</h1>
+        <div class="row mt-4">
+            <div class="col-12">
+                <input type="text" id="numbers-input" class="form-control" placeholder="Enter numbers separated by commas">
+                <button id="startButton" class="btn btn-primary mt-2" onclick="startSorting()">Start Sorting</button>
+            </div>
+        </div>
+        <div class="row mt-4" id="info-table" style="display: none;">
+            <div class="col-3">
+                <table class="table table-bordered">
+                    <tr><th>Gap</th><td id="gap"></td></tr>
+                    <tr><th>Passos</th><td id="steps"></td></tr>
+                    <tr><th>Total</th><td id="total"></td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <table class="table table-bordered" id="data-table">
+                    <thead>
+                        <tr id="header-row"></tr>
+                    </thead>
+                    <tbody>
+                        <tr id="data-row"></tr>
+                    </tbody>
+                </table>
+                <button id="sortButton" class="btn btn-primary mt-2" onclick="sortStep()" style="display: none;">Sort Step</button>
+                <button id="restartButton" class="btn btn-secondary mt-2" onclick="location.reload()" style="display: none;">Restart</button>
+            </div>
+        </div>
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    var data = [];
+    var n = 0;
+    var gap = 0;
+    var currentStep = -1;
+    var cont = 1;
+
+    function shellSortStep() {
+        if (gap != 0) {
+            $('#steps').text(cont);
+            if (currentStep >= 0 && currentStep < n) {
+                var temp = data[currentStep];
+                var j = currentStep;
+                while (j >= gap && data[j - gap] > temp) {
+                    data[j] = data[j - gap];
+                    j -= gap;
+                }
+                data[j] = temp;
+            }
+            currentStep++;
+            if (currentStep >= n) {
+                gap = Math.floor(gap / 2);
+                currentStep = gap;
+                if(gap == 0) {
+                    $('#sortButton').prop('disabled', true);
+                    $('#restartButton').show();
+                }
+            }
+            if(gap != 0)
+                cont++;
+        }
+        renderTable();
+    }
+
+    function renderTable() {
+        $('#header-row').empty();
+        $('#data-row').empty();
+        $('#steps').text(cont);
+        if(gap != 0)
+            $('#gap').text(gap);
+        for (var i = 0; i < data.length; i++) {
+            $('#header-row').append('<th>' + (i) + '</th>');
+            if (gap != 0 && (i === currentStep || i === (currentStep - gap))) {
+                $('#data-row').append('<td class="highlight">' + data[i] + '</td>');
+            } else {
+                $('#data-row').append('<td>' + data[i] + '</td>');
+            }
+        }
+    }
+
+    function startSorting() {
+        var numbers = $('#numbers-input').val().split(',');
+        data = numbers.map(Number);
+        n = data.length;
+        gap = Math.floor(n / 2);
+        currentStep = gap;
+        $('#numbers-input').prop('disabled', true);
+        $('#startButton').prop('disabled', true);
+        $('#sortButton').show();
+        $('#info-table').show();
+        $('#total').text(n);
+        renderTable();
+    }
+
+    function sortStep() {
+        shellSortStep();
+    }
+</script>
+
+</body>
+</html>
